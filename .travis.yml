@@ -1,0 +1,21 @@
+language: cpp
+before_script:
+- sudo apt-get install libboost-test-dev -y
+- echo "deb http://archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
+- sudo apt-get update -qq
+- sudo apt-get install cmake libgtest-dev
+- cd /usr/src/gtest
+- sudo cmake CMakeLists.txt
+- sudo make
+- sudo cp *.a /usr/lib
+- cd $TRAVIS_BUILD_DIR
+script:
+- cmake .
+- cmake --build .
+- cmake --build . --target test
+- cmake --build . --target package
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+  - curl -T IP_UTILITY-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -uperepiskass:b95bae27e6c910cf003bf3c84205775037b24e39 "https://api.bintray.com/content/perepiskass/IP/ip_utility/$TRAVIS_BUILD_NUMBER/ip_utility-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
